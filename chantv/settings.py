@@ -44,13 +44,18 @@ TEMPLATES = [{
 WSGI_APPLICATION = "chantv.wsgi.application"
 
 database_url = os.environ.get("DATABASE_URL", "").strip().strip("'\"").strip()
-if database_url:
+try:
+    database_config = dj_database_url.parse(
+        database_url,
+        conn_max_age=600,
+        conn_health_checks=True,
+    ) if database_url else None
+except ValueError:
+    database_config = None
+
+if database_config:
     DATABASES = {
-        "default": dj_database_url.parse(
-            database_url,
-            conn_max_age=600,
-            conn_health_checks=True,
-        )
+        "default": database_config
     }
 else:
     DATABASES = {
