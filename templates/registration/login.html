@@ -1,0 +1,1 @@
+{% extends 'base.html' %}{% block title %}Sign in | Chan-TV{% endblock %}{% block content %}<section class="login-page"><div class="login-card"><p class="eyebrow">WELCOME BACK</p><h1>Sign in to Chan-TV</h1><form method="post">{% csrf_token %}{{ form.as_p }}<button class="button primary" type="submit">Sign in →</button></form></div></section>{% endblock %}
