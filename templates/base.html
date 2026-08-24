@@ -6,15 +6,17 @@
   <title>{% block title %}Chan-TV{% endblock %}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="manifest" href="{% static 'manifest.webmanifest' %}">
   <link rel="stylesheet" href="{% static 'css/site.css' %}">
 </head>
 <body>
 <header class="topbar"><a class="brand" href="{% url 'home' %}"><span class="brand-mark">C</span><span>chan<span class="accent">-tv</span></span></a>
-  <nav><a href="{% url 'home' %}">Browse</a><a href="#live">Live TV</a><a href="#guide">TV Guide</a><a href="{% url 'sports' %}">Sports</a><a href="#kids">Kids</a></nav>
+  <nav><a href="{% url 'home' %}">Browse</a><a href="#live">Live TV</a><a href="#guide">TV Guide</a><a href="{% url 'sports' %}">Sports</a><a href="{% url 'plans' %}">Plans</a></nav>
   <form class="search" action="{% url 'search' %}"><input name="q" placeholder="Search shows, movies, sport..." aria-label="Search"><button aria-label="Search">⌕</button></form>
   {% if user.is_authenticated %}<a class="avatar" href="{% url 'account' %}">{{ user.username|first|upper }}</a>{% else %}<a class="login" href="{% url 'login' %}">Sign in</a>{% endif %}
 </header>
 <main>{% csrf_token %}{% block content %}{% endblock %}</main>
 <footer><span class="brand"><span class="brand-mark">C</span> chan-tv</span><span>Your screen. Your stories.</span><span>Manage account &nbsp; Help &nbsp; Privacy</span></footer>
 <script>const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value; document.querySelectorAll('[data-toggle-url]').forEach(button => button.addEventListener('click', async () => { const r = await fetch(button.dataset.toggleUrl, {method: 'POST', headers: {'X-CSRFToken': csrfToken}}); const d = await r.json(); button.classList.toggle('saved', d.saved); button.textContent = d.saved ? 'Saved' : '＋ My list'; }));</script>
+<script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('{% static 'sw.js' %}');</script>
 </body></html>

@@ -1,11 +1,13 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Q
+from django.db.models import Count
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
-from .models import (Channel, FavouriteChannel, Match, Programme, Profile, Rental, Review, ScheduleItem,
-                     SubscriptionPlan, UserSubscription, ViewingHistory, WatchlistItem)
+from .models import (Channel, FavouriteChannel, Match, PaymentTransaction, Programme, Profile, Rental, Review,
+                     ScheduleItem, SubscriptionPlan, UserSubscription, ViewingHistory, WatchlistItem)
 
 
 def home(request):
@@ -27,7 +29,8 @@ def watch(request, slug):
     if request.user.is_authenticated:
         WatchlistItem.objects.update_or_create(user=request.user, programme=programme)
         ViewingHistory.objects.update_or_create(user=request.user, programme=programme)
-    return render(request, "stream/watch.html", {"programme": programme})
+    progress = WatchlistItem.objects.filter(user=request.user, programme=programme).values_list("progress_seconds", flat=True).first() if request.user.is_authenticated else 0
+    return render(request, "stream/watch.html", {"programme": programme, "resume_seconds": progress or 0})
 
 
 def search(request):
@@ -54,6 +57,46 @@ def account(request):
 
 def sports(request):
     return render(request, "stream/sports.html", {"matches": Match.objects.select_related("league", "home_team", "away_team")[:20]})
+
+
+@login_required
+@require_POST
+def save_progress(request, programme_id):
+    seconds = max(0, int(request.POST.get("seconds", 0)))
+    WatchlistItem.objects.update_or_create(user=request.user, programme_id=programme_id, defaults={"progress_seconds": seconds})
+    ViewingHistory.objects.update_or_create(user=request.user, programme_id=programme_id, defaults={"progress_seconds": seconds})
+    return JsonResponse({"seconds": seconds})
+
+
+@login_required
+@require_POST
+def select_profile(request, profile_id):
+    profile = get_object_or_404(Profile, id=profile_id, user=request.user)
+    request.session["profile_id"] = profile.id
+    return redirect("account")
+
+
+def plans(request):
+    return render(request, "stream/plans.html", {"plans": SubscriptionPlan.objects.filter(is_active=True)})
+
+
+@login_required
+@require_POST
+def start_payment(request, plan_id):
+    plan = get_object_or_404(SubscriptionPlan, id=plan_id, is_active=True)
+    PaymentTransaction.objects.create(user=request.user, plan=plan, amount=plan.monthly_price)
+    return render(request, "stream/payment_pending.html", {"plan": plan})
+
+
+@staff_member_required
+def analytics(request):
+    return render(request, "stream/analytics.html", {
+        "users": UserSubscription.objects.values("user_id").distinct().count(),
+        "programmes": Programme.objects.count(),
+        "watch_events": ViewingHistory.objects.count(),
+        "payments": PaymentTransaction.objects.filter(status="paid").count(),
+        "top_programmes": ViewingHistory.objects.values("programme__title").annotate(total=Count("id")).order_by("-total")[:10],
+    })
 
 
 @login_required

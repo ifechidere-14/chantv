@@ -24,6 +24,7 @@ class Programme(models.Model):
     slug = models.SlugField(unique=True)
     description = models.TextField(blank=True)
     programme_type = models.CharField(max_length=12, choices=TYPE_CHOICES, default="show")
+    genre = models.CharField(max_length=80, blank=True, help_text="For example: Drama, Comedy, Documentary")
     image_url = models.URLField(blank=True)
     video_url = models.URLField(blank=True)
     video_file = models.FileField(upload_to="videos/%Y/%m/", blank=True, help_text="Upload an MP4 or browser-compatible video file")
@@ -106,6 +107,17 @@ class UserSubscription(models.Model):
     starts_at = models.DateTimeField(auto_now_add=True)
     ends_at = models.DateTimeField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
+
+
+class PaymentTransaction(models.Model):
+    STATUS_CHOICES = [("pending", "Pending"), ("paid", "Paid"), ("failed", "Failed")]
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="payments")
+    plan = models.ForeignKey(SubscriptionPlan, on_delete=models.PROTECT)
+    amount = models.DecimalField(max_digits=8, decimal_places=2)
+    provider = models.CharField(max_length=40, default="manual")
+    provider_reference = models.CharField(max_length=160, blank=True)
+    status = models.CharField(max_length=12, choices=STATUS_CHOICES, default="pending")
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
 class Review(models.Model):
