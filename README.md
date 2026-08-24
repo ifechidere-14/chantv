@@ -26,10 +26,6 @@ Only use video, channel, movie, and sports feeds for which you own or have distr
 1. Push this repository to GitHub or GitLab.
 2. In Render, choose **New > Blueprint** and connect the repository.
 3. Render will use `render.yaml` to create the web service and PostgreSQL database.
-4. After the first deploy, open the service URL and create the admin account from Render Shell:
-
-```bash
-python manage.py createsuperuser
-```
+4. Add `ADMIN_USERNAME` and `ADMIN_PASSWORD` in the service Environment settings. The deploy migration creates that superuser automatically, so Render Free does not require Shell access. Use `admin` for `ADMIN_USERNAME` and choose a strong value for `ADMIN_PASSWORD`. Existing users are never overwritten on later deploys.
 
 Set `CSRF_TRUSTED_ORIGINS` to the exact HTTPS URL Render gives your service if you change the default service name. Do not deploy the development `admin/admin` password.
