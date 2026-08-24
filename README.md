@@ -19,6 +19,8 @@ In Django Admin, create or edit a `Programme` and set `video_url` to an authoris
 
 To upload a movie from your computer, open Django Admin, add or edit a Programme, and use the **Video file** field. MP4 files are recommended for browser compatibility. Uploaded files are stored in the local `media/` folder during development. Render Free has an ephemeral filesystem, so use object storage such as Cloudinary or Amazon S3 for permanent production uploads.
 
+For Cloudinary uploads, add `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, and `CLOUDINARY_API_SECRET` as private environment variables in Render. When all three are present, uploaded programme videos use Cloudinary automatically; otherwise local media storage is used. Rotate any API secret that has been shared publicly before adding it to Render.
+
 The project includes SQLite by default for local development. For production, set a strong `SECRET_KEY`, `DEBUG = False`, `ALLOWED_HOSTS`, HTTPS settings, and move to PostgreSQL or another managed database.
 
 Only use video, channel, movie, and sports feeds for which you own or have distribution rights.
