@@ -17,6 +17,8 @@ Open `http://127.0.0.1:8000/` for the website and `/admin/` to manage channels, 
 
 In Django Admin, create or edit a `Programme` and set `video_url` to an authorised MP4 or HLS stream. Set `image_url` for its poster. Add `Channel` records with their authorised `stream_url` values, then add `ScheduleItem` records for the TV guide.
 
+To upload a movie from your computer, open Django Admin, add or edit a Programme, and use the **Video file** field. MP4 files are recommended for browser compatibility. Uploaded files are stored in the local `media/` folder during development. Render Free has an ephemeral filesystem, so use object storage such as Cloudinary or Amazon S3 for permanent production uploads.
+
 The project includes SQLite by default for local development. For production, set a strong `SECRET_KEY`, `DEBUG = False`, `ALLOWED_HOSTS`, HTTPS settings, and move to PostgreSQL or another managed database.
 
 Only use video, channel, movie, and sports feeds for which you own or have distribution rights.

@@ -26,6 +26,7 @@ class Programme(models.Model):
     programme_type = models.CharField(max_length=12, choices=TYPE_CHOICES, default="show")
     image_url = models.URLField(blank=True)
     video_url = models.URLField(blank=True)
+    video_file = models.FileField(upload_to="videos/%Y/%m/", blank=True, help_text="Upload an MP4 or browser-compatible video file")
     duration_minutes = models.PositiveIntegerField(default=45)
     is_featured = models.BooleanField(default=False)
     is_downloadable = models.BooleanField(default=False)
