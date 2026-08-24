@@ -1,0 +1,1 @@
+{% extends 'base.html' %}{% block title %}Create account | Chan-TV{% endblock %}{% block content %}<section class="login-page"><div class="login-card"><p class="eyebrow">JOIN CHAN-TV</p><h1>Create your account</h1><form method="post">{% csrf_token %}{{ form.as_p }}<button class="button primary" type="submit">Create account →</button></form></div></section>{% endblock %}
