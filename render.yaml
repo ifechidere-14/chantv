@@ -3,7 +3,7 @@ services:
     name: chan-tv
     runtime: python
     buildCommand: pip install -r requirements.txt && python manage.py collectstatic --no-input && python manage.py migrate
-    startCommand: gunicorn chantv.wsgi:application
+    startCommand: python manage.py migrate --noinput && gunicorn chantv.wsgi:application
     envVars:
       - key: SECRET_KEY
         generateValue: true
